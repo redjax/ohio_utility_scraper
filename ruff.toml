@@ -1,0 +1,88 @@
+## Enable pycodestyle ("E") and Pyflakes ("F") codes by default
+#  # Docs: https://beta.ruff.rs/docs/rules/
+select = [
+    "D",  ## pydocstyle
+    "E",  ## pycodestyle
+    "I",  ## isort
+]
+ignore = [
+    "D203",  ## one-blank-line-before-class
+    "D213"  ## multi-line-summary-second-line
+]
+
+## Allow autofix for all enabled rules (when "--fix") is provided.
+#  NOTE: Leaving these commented until I know what they do
+#  Docs: https://beta.ruff.rs/docs/rules/
+fixable = [
+    # "A",  ## flake8-builtins
+    # "B",  ## flake8-bugbear
+    "C",
+    "D",  ## pydocstyle
+    "E",  ## pycodestyle-error
+    # "F",  ## pyflakes
+    # "G",  ## flake8-logging-format
+    "I",  ## isort
+    "N",  ## pep8-naming
+    # "Q",  ## flake8-quotas
+    # "S",  ## flake8-bandit
+    "T",
+    "W",  ## pycodestyle-warning
+    # "ANN",  ## flake8-annotations
+    # "ARG",  ## flake8-unused-arguments
+    # "BLE",  ## flake8-blind-except
+    # "COM", ## flake8-commas
+    # "DJ",  ## flake8-django
+    # "DTZ",  ## flake8-datetimez
+    # "EM",  ## flake8-errmsg
+    "ERA",  ## eradicate
+    # "EXE",  ## flake8-executables
+    # "FBT",  ## flake8-boolean-trap
+    # "ICN",  ## flake8-imort-conventions
+    # "INP",  ## flake8-no-pep420
+    # "ISC",  ## flake8-implicit-str-concat
+    # "NPY",  ## NumPy-specific rules
+    # "PD",  ## pandas-vet
+    # "PGH",  ## pygrep-hooks
+    # "PIE",  ## flake8-pie
+    "PL",  ## pylint
+    # "PT",  ## flake8-pytest-style
+    # "PTH",  ## flake8-use-pathlib
+    # "PYI",  ## flake8-pyi
+    # "RET",  ## flake8-return
+    # "RSE",  ## flake8-raise
+    "RUF",  ## ruf-specific rules
+    # "SIM",  ## flake8-simplify
+    # "SLF",  ## flake8-self
+    # "TCH",  ## flake8-type-checking
+    # "TID",  ## flake8-tidy-imports
+    "TRY",  ## tryceratops
+    "UP",  ## pyupgrade
+    # "YTT"  ## flake8-2020
+]
+# unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "__pycache__",
+    "*.pyc"
+]
+per-file-ignores = {"__init__.py" = ["D104"]}
+
+## Same as Black.
+line-length = 88
+
+## Allow unused variables when underscore-prefixed.
+# dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+## Set assumed Python version
+target-version = "py310"
+
+[mccabe]
+max-complexity = 10

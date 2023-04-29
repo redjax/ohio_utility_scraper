@@ -1,0 +1,12 @@
+**/__pycache__
+**/*.pyc
+
+**/.cache
+**/*.log
+**/*.log.*
+
+**/*.env
+**/*.*.env
+
+!**/*.*example*
+!**/*.*example*.*
