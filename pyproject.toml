@@ -1,26 +1,26 @@
-[tool.poetry]
-name = "ohioenergy"
-version = "0.1.0"
+[tool.pdm]
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "black>=23.3.0",
+    "ruff>=0.0.263",
+    "pytest>=7.3.1",
+]
+[project]
+name = ""
+version = ""
 description = ""
-authors = []
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-scrapy = "^2.8.0"
-pydantic = {extras = ["dotenv"], version = "^1.10.7"}
-sqlalchemy = "^2.0.11"
-stackprinter = "^0.2.10"
-requests-cache = "^1.0.1"
-arrow = "^1.2.3"
-msgpack = "^1.0.5"
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-ruff = "^0.0.263"
-pytest = "^7.3.1"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+authors = [
+    {name = "redjax", email = "None"},
+]
+dependencies = [
+    "scrapy>=2.8.0",
+    "pydantic[dotenv]>=1.10.7",
+    "sqlalchemy>=2.0.11",
+    "stackprinter>=0.2.10",
+    "requests-cache>=1.0.1",
+    "arrow>=1.2.3",
+    "msgpack>=1.0.5",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}

@@ -1,6 +1,8 @@
 **/__pycache__
 **/*.pyc
 
+**/.scrapy
+
 **/.cache
 **/*.log
 **/*.log.*
@@ -10,3 +12,4 @@
 
 !**/*.*example*
 !**/*.*example*.*
+.pdm-python
