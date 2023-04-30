@@ -163,3 +163,5 @@ class OhioenergyprovidersSpider(scrapy.Spider):
         providers = unique_providers
 
         log.debug(f"Providers length: {len(providers)}")
+
+        yield providers
