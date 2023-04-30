@@ -6,18 +6,18 @@ import scrapy
 from core.config import logging_settings
 from core.logging.logger import get_logger
 from lib.time_utils import get_ts
+from lib.file_utils import ensure_dir, write_scrapy_text_to_file
+from lib.text_utils import clean_word_list, extract_table_header_names
 from scrapy.http.response.html import HtmlResponse
 
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)
 
 output_dir = "tmp"
+html_output_dir = "html_out"
 default_cache_dir = ".cache"
 
-if not Path(default_cache_dir).exists():
-    Path(default_cache_dir).mkdir(exist_ok=True, parents=True)
-
-# if not Path(output_dir).exists():
-#     Path(output_dir).mkdir(exist_ok=True, parents=True)
+ensure_dir(default_cache_dir)
+ensure_dir(html_output_dir)
 
 
 def serialize(
@@ -26,13 +26,7 @@ def serialize(
     output_dir: str = None,
     filename: str = f"{get_ts()}_illuminatingco_htmlbody_util.msgpack",
 ):
-    if not Path(cache_dir).exists():
-        Path(cache_dir).mkdir(parents=True, exist_ok=True)
-
-    if output_dir:
-        if not Path(f"{cache_dir}/{output_dir}").exists():
-            log.info(f"Creating dir: {f'{cache_dir}/{output_dir}'}")
-            Path(f"{cache_dir}/{output_dir}").mkdir(parents=True, exist_ok=True)
+    ensure_dir(dir_path=f"{cache_dir}/{output_dir}")
 
     if not output_dir:
         output_file = f"{cache_dir}/{filename}"
@@ -78,90 +72,104 @@ class OhioenergyprovidersSpider(scrapy.Spider):
     ]
 
     def parse(self, response: HtmlResponse):
-        log.info("Parsing response")
+        log.info(f"Begin parsing")
 
-        ## Get HTML table section
-        table_content = response.css(
-            "#ctl00_ContentPlaceHolder1_upOffers > div.tab-right"
-        )
-        # log.debug(f"Table content: {table_content.extract()}")
+        #########################
+        # Pre-defined Selectors #
+        #########################
 
-        ## Extract table body
-        table_body = table_content.css("table > tbody")
-        # log.debug(f"Table body: {table_body.extract()}")
+        ## Class selector for main table
+        SELECT_table_classes = "table-container persist-area"
+        ## Class selector for thead with table column names
+        SELECT_thead_col_names_select_classes = "persist-header"
 
-        ## Extract rows from body
-        table_rows = table_body.xpath("//tr")
-        # log.debug(f"Table rows: {table_rows.extract()}")
+        #####################
+        # Main table scrape #
+        #####################
 
-        ## Initialize lists for looping over table rows
-        providers_tmp = []
-        seen_providers = []
-        unique_providers = []
+        ## Select main table tag
+        table = response.xpath(f"//table[@class='{SELECT_table_classes}']")
+        # log.debug(f"Table ({type(table)})")
 
-        ## Loop table rows
-        for row in table_rows:
-            ## Get provider details span content
-            provider_span = row.css("span.retail-title")
-            ## Get name, address paragraphs
-            provider_name_address = provider_span.css("::text").extract()
-            # log.debug(f"Provider:\n{provider_name_address}")
+        ## Write table HTML to file
+        table_html_path = f"{html_output_dir}/table.html"
+        write_scrapy_text_to_file(scrapy_text=table, output_file=table_html_path)
 
-            ## Initialize empty list to store provider contact values
-            values = []
+        #############################
+        # Table Head <thead> scrape #
+        #############################
 
-            ## Ensure provider name/address span text was found
-            if provider_name_address:
-                # list_len = len(provider_name_address)
-                # log.debug(f"Provider name/address length: {list_len}")
+        ## Select thead tag
+        table_headers = table.xpath(".//thead")
+        # log.debug(f"Table header ({type(table_headers)})")
 
-                ## Loop over values in provider_name_addresses list
-                for val in provider_name_address:
-                    if val:
-                        # log.debug(f"Provider name/address value: {val}")
-                        ## Extract value
-                        values.append(val)
-
-                # log.debug(f"Current values: {values}")
-
-                ## Extract provider's URL
-                provider_url = row.css("p a::attr(href)").extract_first()
-
-                ## Build a dict of provider data
-                _provider = {
-                    "name": values[0],
-                    "details": {
-                        "address": " ".join(values[1:-1]),
-                        "phone": values[-1],
-                        "url": provider_url,
-                    },
-                }
-                # log.debug(f"Provider: {_provider}")
-
-                ## Append to temporary providers list
-                providers_tmp.append(_provider)
-
-                # log.debug(f"Current providers: {providers}")
-
-            # log.debug(f"Providers: {providers}")
-
-        ## Loop over found providers and cleanup list, reduce duplicates
-        for provider in providers_tmp:
-            ## Ensure provider has not been seen
-            if provider["name"] not in seen_providers:
-                # log.debug(f"Unique provider detected: {provider['name']}")
-                ## Add unseen providers to seen_providers list
-                seen_providers.append(provider["name"])
-                ## Add to unique providers
-                unique_providers.append(provider)
-
-        log.debug(
-            f"Original list len: {len(providers_tmp)}, cleanup len: {len(unique_providers)}"
+        ## Write table header HTML to file
+        table_headers_html_path = f"{html_output_dir}/table_head.html"
+        write_scrapy_text_to_file(
+            scrapy_text=table_headers, output_file=table_headers_html_path
         )
 
-        ## Set providers list to unique/deduplicated list
-        providers = unique_providers
+        ## Select header with table column names
+        thead_col_names_select = table_headers.xpath(
+            f".//tr[@class='{SELECT_thead_col_names_select_classes}']"
+        )
 
-        log.debug(f"Providers length: {len(providers)}")
+        ## Write thead column names to file
+        thead_col_names_select_html_path = (
+            f"{html_output_dir}/thead_col_names_select.html"
+        )
+        write_scrapy_text_to_file(
+            scrapy_text=thead_col_names_select,
+            output_file=thead_col_names_select_html_path,
+        )
 
-        yield providers
+        thead_headers = extract_table_header_names(
+            scrapy_thead_text=thead_col_names_select
+        )
+        log.debug(f"Table Header Column Names: {thead_headers}")
+
+        #############################
+        # Table Body <tbody> scrape #
+        #############################
+
+        ## Select tbody tag
+        table_body = table.xpath(".//tbody")
+        # log.debug(f"Table body ({type(table_body)})")
+
+        ## Write table body HTML to file
+        table_body_html_path = f"{html_output_dir}/table_body.html"
+        write_scrapy_text_to_file(
+            scrapy_text=table_body, output_file=table_body_html_path
+        )
+
+        tbody_provider_trs_select = table_body.xpath(".//tr")
+
+        providers = []
+
+        provider_loop_count = 1
+
+        for provider_tr in tbody_provider_trs_select:
+            # log.debug(
+            #     f"Provider TR [{provider_loop_count}] ({type(provider_tr)}): {provider_tr}"
+            # )
+
+            provider_tds = []
+            provider_td_loop_count = 1
+
+            provider_tr_tds_select = provider_tr.xpath(".//td")
+
+            for provider_tr_td in provider_tr_tds_select.extract():
+                # log.debug(
+                #     f"Provider <tr> <td> [{provider_td_loop_count}] ({type(provider_tr_td)}): {provider_tr_td}"
+                # )
+
+                provider_tds.append(provider_tr_td)
+
+                provider_td_loop_count += 1
+
+            _provider = {f"{provider_loop_count}": {"tds": provider_tds}}
+            providers.append(_provider)
+            provider_loop_count += 1
+
+        log.debug(f"Provider TRs looped: {provider_loop_count}")
+        log.debug(f"Providers ({len(providers)}): {providers}")
