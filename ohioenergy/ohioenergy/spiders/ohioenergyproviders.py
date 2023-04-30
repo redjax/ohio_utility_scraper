@@ -58,17 +58,6 @@ def prepare_res_obj(response: HtmlResponse = None) -> dict:
     res_flags: list | None = response.flags
     res_url: str | None = response.url
 
-    #     print(
-    #         f"""
-    # Response types:
-    # body: {type(res_body)}
-    # attributes: {type(res_attributes)}
-    # encoding: {type(res_encoding)}
-    # flags: {type(res_flags)}
-    # url: {type(res_url)}
-    #           """
-    #     )
-
     return_obj = {
         "attributes": res_attributes,
         "encoding": res_encoding,
@@ -76,8 +65,6 @@ def prepare_res_obj(response: HtmlResponse = None) -> dict:
         "url": res_url,
         "body": res_body,
     }
-
-    # return_obj_json = json.dumps(return_obj)
 
     return return_obj
 
@@ -93,27 +80,86 @@ class OhioenergyprovidersSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         log.info("Parsing response")
 
-        # print(f"Response dict keys: {vars(response).keys()}")
-        res_body = response.body.decode()
+        ## Get HTML table section
+        table_content = response.css(
+            "#ctl00_ContentPlaceHolder1_upOffers > div.tab-right"
+        )
+        # log.debug(f"Table content: {table_content.extract()}")
 
-        serialize(input=response.body, output_dir="illuminating_co")
+        ## Extract table body
+        table_body = table_content.css("table > tbody")
+        # log.debug(f"Table body: {table_body.extract()}")
 
-        res_prepared = prepare_res_obj(response)
+        ## Extract rows from body
+        table_rows = table_body.xpath("//tr")
+        # log.debug(f"Table rows: {table_rows.extract()}")
 
-        res_json = res_prepared
+        ## Initialize lists for looping over table rows
+        providers_tmp = []
+        seen_providers = []
+        unique_providers = []
 
-        # with open(f"{output_dir}/{get_ts()}res.json", "w") as f:
-        #     try:
-        #         json.dump(res_json, f, indent=4)
-        #     except Exception as exc:
-        #         raise Exception(
-        #             f"Unhandled exception dumping response JSON. Details:\n{exc}"
-        #         )
+        ## Loop table rows
+        for row in table_rows:
+            ## Get provider details span content
+            provider_span = row.css("span.retail-title")
+            ## Get name, address paragraphs
+            provider_name_address = provider_span.css("::text").extract()
+            # log.debug(f"Provider:\n{provider_name_address}")
 
-        # f.close()
+            ## Initialize empty list to store provider contact values
+            values = []
 
-        # with open(f"{output_dir}/{get_ts()}_output", "w") as f:
-        #     f.write(res_body)
+            ## Ensure provider name/address span text was found
+            if provider_name_address:
+                # list_len = len(provider_name_address)
+                # log.debug(f"Provider name/address length: {list_len}")
 
-        # f.close()
-        pass
+                ## Loop over values in provider_name_addresses list
+                for val in provider_name_address:
+                    if val:
+                        # log.debug(f"Provider name/address value: {val}")
+                        ## Extract value
+                        values.append(val)
+
+                # log.debug(f"Current values: {values}")
+
+                ## Extract provider's URL
+                provider_url = row.css("p a::attr(href)").extract_first()
+
+                ## Build a dict of provider data
+                _provider = {
+                    "name": values[0],
+                    "details": {
+                        "address": " ".join(values[1:-1]),
+                        "phone": values[-1],
+                        "url": provider_url,
+                    },
+                }
+                # log.debug(f"Provider: {_provider}")
+
+                ## Append to temporary providers list
+                providers_tmp.append(_provider)
+
+                # log.debug(f"Current providers: {providers}")
+
+            # log.debug(f"Providers: {providers}")
+
+        ## Loop over found providers and cleanup list, reduce duplicates
+        for provider in providers_tmp:
+            ## Ensure provider has not been seen
+            if provider["name"] not in seen_providers:
+                # log.debug(f"Unique provider detected: {provider['name']}")
+                ## Add unseen providers to seen_providers list
+                seen_providers.append(provider["name"])
+                ## Add to unique providers
+                unique_providers.append(provider)
+
+        log.debug(
+            f"Original list len: {len(providers_tmp)}, cleanup len: {len(unique_providers)}"
+        )
+
+        ## Set providers list to unique/deduplicated list
+        providers = unique_providers
+
+        log.debug(f"Providers length: {len(providers)}")

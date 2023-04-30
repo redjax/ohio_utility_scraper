@@ -2,6 +2,10 @@
 
 The main script imports spiders and runs them with CrawlerProcess.
 """
+import stackprinter
+
+stackprinter.set_excepthook(style="darkbg2")
+
 import scrapy
 from core.config import logging_settings
 from core.logging.logger import default_fmt, get_logger

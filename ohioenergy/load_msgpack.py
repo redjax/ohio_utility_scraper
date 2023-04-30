@@ -51,4 +51,4 @@ if __name__ == "__main__":
 
     for _load in loaded:
         log.debug(f"Loaded pack type: {type(_load)}")
-        # log.debug(f"Contents: {_load}")
+        log.debug(f"Contents: {_load}")

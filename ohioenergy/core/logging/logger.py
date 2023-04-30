@@ -14,7 +14,7 @@ valid_levels = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
 default_fmt = "[%(levelname)s][%(asctime)s][%(name)s]: %(message)s"
 default_extended_fmt = "[%(asctime)s]:[%(levelname)s]:[%(name)s] -> [%(funcName)s()]:[Line-%(lineno)d]> %(message)s"
-default_file_fmt = "[%(asctime)s]:[%(levelname)s]:[%(name)s]:Proc:%(process)d]:[Line-%(lineno)d]> %(message)s"
+default_file_fmt = "[%(asctime)s]:[%(levelname)s]:[%(name)s]:[Proc:%(process)d]:[Line-%(lineno)d]> %(message)s"
 default_date_fmt = "%Y-%m-%d_%H:%M:%S"
 
 
@@ -75,7 +75,7 @@ class FileLogger(BaseLogger):
         default=logging.Formatter(fmt=default_file_fmt, datefmt=default_date_fmt)
     )
     rotate_when: str = Field(default="midnight")
-    max_bytes: int = 100 * 1024
+    max_bytes: int = 10 * 1024
     backup_count: int = 3
 
 
