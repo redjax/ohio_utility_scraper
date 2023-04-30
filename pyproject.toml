@@ -24,3 +24,10 @@ dependencies = [
 ]
 requires-python = ">=3.10"
 license = {text = "MIT"}
+
+[tool.pdm.scripts]
+## Scripts can be run with pdm run <name-of-script>
+
+format = {cmd = "ruff check . --fix"}
+start = {shell = "cd ohioenergy && python main.py"}
+
