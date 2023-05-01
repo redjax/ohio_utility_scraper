@@ -5,16 +5,14 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+import json
+from pathlib import Path
 
 import msgpack
 from core.config import logging_settings
 from core.logging.logger import get_logger
+from itemadapter import ItemAdapter
 from lib.time_utils import get_ts
-
-from pathlib import Path
-import json
-
 from scrapy.http.response.html import HtmlResponse
 
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)

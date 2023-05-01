@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from typing import Union
+from decimal import Decimal
+
 import msgpack
 from core.config import logging_settings
 from core.logging.logger import get_logger
@@ -7,20 +10,29 @@ from core.logging.logger import get_logger
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)
 
 
-def get_packs(cache_dir: str = ".cache") -> list[str]:
-    packs = []
+def loop_dir(
+    _path: Path = None, packs_list: list = None
+) -> list[dict[str, Union[str, float, Decimal, int, None]]]:
+    # log.debug(f"Looping path: {_path}")
 
-    for pack in Path(cache_dir).iterdir():
-        if pack.is_file():
-            packs.append(pack)
-        elif pack.is_dir():
-            for _pack in pack.iterdir():
-                if _pack.is_file():
-                    packs.append(_pack)
-                elif _pack.is_dir():
-                    raise NotImplemented(
-                        f"Recursion below 2 subdirectories is not implemented yet."
-                    )
+    for item in _path.iterdir():
+        # log.debug(f"Item: {item}")
+
+        if item.is_file():
+            # log.debug(f"Item is a file.")
+            packs_list.append(str(item))
+
+        elif item.is_dir():
+            # log.debug(f"Item is a dir.")
+            loop_dir(_path=item, packs_list=packs_list)
+
+    return packs_list
+
+
+def get_packs(cache_dir: str = ".cache") -> list[str]:
+    packs_list = []
+
+    packs = loop_dir(_path=Path(cache_dir), packs_list=packs_list)
 
     return packs
 
@@ -39,7 +51,7 @@ def load_msgpackb(file: Path = None):
 
 if __name__ == "__main__":
     packs = get_packs()
-    log.debug(f"Packs: {packs}")
+    # log.debug(f"Packs: {packs}")
 
     loaded = []
 
@@ -47,8 +59,8 @@ if __name__ == "__main__":
         _load = load_msgpackb(file=pack)
         loaded.append(_load)
 
-    log.debug(f"Loaded {len(loaded)} packs.")
-
     for _load in loaded:
         log.debug(f"Loaded pack type: {type(_load)}")
         log.debug(f"Contents: {_load}")
+
+    log.info(f"Loaded {len(loaded)} packs.")

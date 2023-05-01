@@ -4,6 +4,8 @@
 **/.scrapy
 
 **/.cache
+**/html_out
+
 **/*.log
 **/*.log.*
 

@@ -1,4 +1,10 @@
 from pathlib import Path
+
+from core.config import logging_settings
+from core.logging.logger import get_logger
+
+log = get_logger(__name__, level=logging_settings.LOG_LEVEL)
+
 from scrapy.selector.unified import SelectorList
 
 
@@ -7,8 +13,7 @@ def ensure_dir(dir_path: str = None):
 
     Checks if path exists, creates if not.
     """
-
-    print(f"Ensuring path exists ({type(dir_path)}): {dir_path}")
+    # log.debug(f"Ensuring path exists ({type(dir_path)}): {dir_path}")
 
     if not dir_path:
         raise ValueError("Missing directory path")
@@ -34,7 +39,6 @@ def write_scrapy_text_to_file(
     scrapy_text should be a Scrapy object, i.e. response.xpath(...).
     output_file should be a filepath, i.e. html_output/file_name.html.
     """
-
     try:
         if not Path(output_file).exists():
             with open(output_file, "w") as f:

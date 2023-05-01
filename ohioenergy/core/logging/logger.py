@@ -12,7 +12,7 @@ THIS_DIR = Path(__file__).parent
 default_log_file = "logs/app.log"
 valid_levels = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
-default_fmt = "[%(levelname)s][%(asctime)s][%(name)s]: %(message)s"
+default_fmt = "[%(levelname)s][%(asctime)s][%(name)s ln: %(lineno)d]: %(message)s"
 default_extended_fmt = "[%(asctime)s]:[%(levelname)s]:[%(name)s] -> [%(funcName)s()]:[Line-%(lineno)d]> %(message)s"
 default_file_fmt = "[%(asctime)s]:[%(levelname)s]:[%(name)s]:[Proc:%(process)d]:[Line-%(lineno)d]> %(message)s"
 default_date_fmt = "%Y-%m-%d_%H:%M:%S"
