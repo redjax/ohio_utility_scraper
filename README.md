@@ -9,9 +9,26 @@ Scrapes [Energy Choice Ohio](https://energychoice.ohio.gov/ApplesToApplesCompari
 
 ## Usage
 
-Run: `$ scrapy crawl ohioenergyproviders`
+### With PDM
 
-Or with Poetry: `$ scrapy crawl ohioenergyproviders`
+- Setup environment
+  - `$ pdm install`
+- Run start script
+  - `$ pdm start`
+
+### Without PDM
+
+- Create `venv`
+  - `$ virtualenv .venv`
+- Activate `venv`
+  - Linux: `$ . .venv/bin/activate`
+- Install requirements
+  - `$ pip install -r requirements.txt`
+- `cd` to app directory
+  - `$ cd ohioenergy`
+- Run crawler(s)
+  - `$ python main.py`
+
 
 ## Notes
 
