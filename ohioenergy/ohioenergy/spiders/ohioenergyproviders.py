@@ -1,7 +1,6 @@
 import json
 from decimal import Decimal
 from pathlib import Path
-
 from typing import Union
 
 import msgpack
@@ -16,7 +15,7 @@ from lib.text_utils import (
     parse_providers_table,
     parse_table_body,
 )
-from lib.time_utils import get_ts, get_date
+from lib.time_utils import get_date, get_ts
 from scrapy.http.response.html import HtmlResponse
 
 from ohioenergy.items import OhioenergyItem
@@ -55,11 +54,14 @@ class OhioenergyprovidersSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         log.info(f"Begin parsing")
 
+        scrape_ts = get_ts()
+
         parsed_table = parse_providers_table(scrapy_response=response)
 
         for item in parsed_table["table_body"]:
             ## Create OhioenergyItem to pass into pipelines
             item["utility_type"] = "electric"
+            item["scrape_timestamp"] = scrape_ts
             provider_item = OhioenergyItem(**item)
 
             ## Yield items, pipelines kick in next. If no pipelines,

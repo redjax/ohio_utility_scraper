@@ -10,6 +10,7 @@ class OhioenergyItem(scrapy.Item):
     # define the fields for your item here like:
     # table_id = scrapy.Field()
     utility_type = scrapy.Field()
+    scrape_timestamp = scrapy.Field()
     name = scrapy.Field()
     address = scrapy.Field()
     phone = scrapy.Field()

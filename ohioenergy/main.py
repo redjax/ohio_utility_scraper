@@ -8,10 +8,13 @@ stackprinter.set_excepthook(style="darkbg2")
 
 import scrapy
 from core.config import logging_settings
+from core.database import Base, SessionLocal, engine, get_db
 from core.logging.logger import default_fmt, get_logger
+from models import provider_models
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.log import configure_logging
 from scrapy.utils.project import get_project_settings
+from sqlalchemy import select
 from twisted.internet import reactor
 
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)

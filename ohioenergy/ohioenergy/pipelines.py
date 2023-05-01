@@ -6,17 +6,19 @@
 
 # useful for handling different item types with a single interface
 import json
-from pathlib import Path
-
-from typing import Union
 from decimal import Decimal
+from pathlib import Path
+from typing import Union
 
 import msgpack
 from core.config import logging_settings
+from core.database import SessionLocal, generate_uuid, generate_uuid_str
 from core.logging.logger import get_logger
 from itemadapter import ItemAdapter
-from lib.time_utils import get_ts, get_date, get_hour
+from lib.time_utils import get_date, get_hour, get_ts
+from models import provider_models
 from scrapy.http.response.html import HtmlResponse
+from sqlalchemy.exc import IntegrityError
 
 from ohioenergy.items import OhioenergyItem
 
@@ -116,3 +118,41 @@ class OhioenergySerializePipeline:
             output_dir=f"providers/{get_date()}/{get_hour()}",
             filename=f"{get_ts()}_{item['name']}.msgpack",
         )
+
+
+class OhioenergySavePipeline:
+    """Save OhioenergyItem to database."""
+
+    def process_item(self, item: OhioenergyItem, spider):
+        """Process item, save to database."""
+        if not item:
+            raise ValueError("Missing item data")
+
+        # log.debug(f"Item ({type(item)}: {item})")
+        item_dict = item.__dict__["_values"]
+        # log.debug(f"Item dict: {item_dict}")
+        session = SessionLocal
+        # log.debug(f"Session ({type(session)}): {session}")
+
+        item_dict["id"] = generate_uuid_str()
+
+        provider = provider_models.OhioenergyProvider(**item_dict)
+        log.debug(f"Provider: {provider}")
+
+        for _item in provider.__dict__:
+            log.debug(f"Provider item ({type(_item)}): {_item}")
+
+        with session as sess:
+            try:
+                result = sess.add(provider)
+                log.debug(f"Provider add result: {result}")
+            except IntegrityError as integrity_exc:
+                raise IntegrityError(
+                    f"Integrity error adding provider to session. Exception details: {integrity_exc}"
+                )
+            except Exception as exc:
+                raise Exception(
+                    f"Unhandled exception adding provider to session. Exception defailt: {exc}"
+                )
+
+            session.commit()

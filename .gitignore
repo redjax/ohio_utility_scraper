@@ -6,6 +6,8 @@
 **/.cache
 **/html_out
 
+**/*.sqlite
+
 **/*.log
 **/*.log.*
 
