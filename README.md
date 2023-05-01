@@ -1,3 +1,12 @@
+# Ohio Energy Provider Comparison
+
+[![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm.fming.dev)
+
+Scrapes [Energy Choice Ohio](https://energychoice.ohio.gov/ApplesToApplesComparision.aspx)'s provider comparison tables.
+
+- [ELECTRIC](https://energychoice.ohio.gov/ApplesToApplesComparision.aspx?Category=Electric&TerritoryId=6&RateCode=1)
+- [GAS](https://energychoice.ohio.gov/ApplesToApplesComparision.aspx?Category=NaturalGas&TerritoryId=8&RateCode=1)
+
 ## Usage
 
 Run: `$ scrapy crawl ohioenergyproviders`
