@@ -59,6 +59,7 @@ class OhioenergyprovidersSpider(scrapy.Spider):
 
         for item in parsed_table["table_body"]:
             ## Create OhioenergyItem to pass into pipelines
+            item["utility_type"] = "electric"
             provider_item = OhioenergyItem(**item)
 
             ## Yield items, pipelines kick in next. If no pipelines,
