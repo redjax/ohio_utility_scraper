@@ -19,6 +19,8 @@ from lib.text_utils import (
 from lib.time_utils import get_ts, get_date
 from scrapy.http.response.html import HtmlResponse
 
+from ohioenergy.items import OhioenergyItem
+
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)
 
 
@@ -51,37 +53,14 @@ class OhioenergyprovidersSpider(scrapy.Spider):
     ]
 
     def parse(self, response: HtmlResponse):
-        def serialize_providers(
-            providers: list[
-                dict[str, Union[str, float, Decimal, int, bool, None]]
-            ] = None
-        ) -> None:
-            ## Serialize providers
-            for provider in providers:
-                # log.debug(f"Provider type: {type(provider)}")
-
-                # for k in provider.keys():
-                #     log.debug(f"Provider item ({type(provider[k])}): {provider[k]}")
-
-                _serialize_prep = json.dumps(provider, indent=2).encode("utf-8")
-                # log.debug(f"Serialize string type: {type(_serialize_prep)}")
-
-                provider_serialize = serialize(
-                    input=_serialize_prep,
-                    output_dir=f"providers/{get_date()}",
-                    filename=f"{get_ts()}_{provider['name']}.msgpack",
-                )
-
         log.info(f"Begin parsing")
 
         parsed_table = parse_providers_table(scrapy_response=response)
 
-        table_headers = parsed_table["table_headers"]
-        providers: list[
-            dict[str, Union[str, float, Decimal, int, bool, None]]
-        ] = parsed_table["table_body"]
+        for item in parsed_table["table_body"]:
+            ## Create OhioenergyItem to pass into pipelines
+            provider_item = OhioenergyItem(**item)
 
-        log.debug(f"Number of providers: {len(providers)}")
-        log.debug(f"Table headers: {table_headers}")
-
-        serialize_providers(providers=providers)
+            ## Yield items, pipelines kick in next. If no pipelines,
+            #  item will just be returned
+            yield provider_item

@@ -8,12 +8,17 @@
 import json
 from pathlib import Path
 
+from typing import Union
+from decimal import Decimal
+
 import msgpack
 from core.config import logging_settings
 from core.logging.logger import get_logger
 from itemadapter import ItemAdapter
-from lib.time_utils import get_ts
+from lib.time_utils import get_ts, get_date, get_hour
 from scrapy.http.response.html import HtmlResponse
+
+from ohioenergy.items import OhioenergyItem
 
 log = get_logger(__name__, level=logging_settings.LOG_LEVEL)
 
@@ -51,6 +56,26 @@ def serialize(
         f.write(packed)
 
 
+def serialize_providers(
+    providers: list[dict[str, Union[str, float, Decimal, int, bool, None]]] = None
+) -> None:
+    ## Serialize providers
+    for provider in providers:
+        # log.debug(f"Provider type: {type(provider)}")
+
+        # for k in provider.keys():
+        #     log.debug(f"Provider item ({type(provider[k])}): {provider[k]}")
+
+        _serialize_prep = json.dumps(provider, indent=2).encode("utf-8")
+        # log.debug(f"Serialize string type: {type(_serialize_prep)}")
+
+        provider_serialize = serialize(
+            input=_serialize_prep,
+            output_dir=f"providers/{get_date()}",
+            filename=f"{get_ts()}_{provider['name']}.msgpack",
+        )
+
+
 def prepare_res_obj(response: HtmlResponse = None) -> dict:
     if not response:
         raise ValueError("Missing HtmlResponse object.")
@@ -73,17 +98,21 @@ def prepare_res_obj(response: HtmlResponse = None) -> dict:
 
 
 class OhioenergyPipeline:
-    def process_item(self, item, spider):
-        log.info("Starting OhioenergyPipeline.process_item()")
-        log.debug(f"Item: {item}")
-        log.info("Finish processing item.")
-
-        return item
+    def process_item(self, item: OhioenergyItem, spider):
+        pass
 
 
-class SerializePipeline:
-    def process_item(self, item, spider):
-        item_bytes = json.dumps(item).encode("utf-8")
+class OhioenergySerializePipeline:
+    def process_item(self, item: OhioenergyItem, spider):
+        item_dict = item.__dict__["_values"]
+        # log.debug(f"Item dict ({type(item_dict)}): {item_dict}")
 
-        log.info(f"Serializing results.")
-        serialize(input=item_bytes)
+        providers_bytes = json.dumps(item_dict).encode("utf-8")
+        # log.debug(f"Provider bytes ({type(providers_bytes)}): {providers_bytes}")
+
+        # log.info(f"Serializing results.")
+        serialize(
+            input=providers_bytes,
+            output_dir=f"providers/{get_date()}/{get_hour()}",
+            filename=f"{get_ts()}_{item['name']}.msgpack",
+        )

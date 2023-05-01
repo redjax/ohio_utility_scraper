@@ -13,3 +13,9 @@ def get_date(fmt: str = "YYYY-MM-DD") -> arrow.Arrow:
     date = arrow.now().format(fmt=fmt)
 
     return date
+
+
+def get_hour(fmt: str = "HH") -> arrow.Arrow:
+    hour = arrow.now().format(fmt=fmt)
+
+    return hour

@@ -205,7 +205,7 @@ def parse_table_body(scrapy_tbody_text: SelectorList):
         # log.debug(f"Promo offers: {promo_offers_content}")
 
         _provider = {
-            "table_id": provider_loop_count,
+            # "table_id": provider_loop_count,
             "name": provider_name_content,
             "address": provider_address_content,
             "phone": provider_phone_content,
