@@ -7,3 +7,15 @@ def get_ts(fmt: str = default_date_fmt) -> arrow.Arrow:
     ts = arrow.now().format(fmt=fmt)
 
     return ts
+
+
+def get_date(fmt: str = "YYYY-MM-DD") -> arrow.Arrow:
+    date = arrow.now().format(fmt=fmt)
+
+    return date
+
+
+def get_hour(fmt: str = "HH") -> arrow.Arrow:
+    hour = arrow.now().format(fmt=fmt)
+
+    return hour

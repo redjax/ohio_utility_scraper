@@ -62,9 +62,11 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    "ohioenergy.pipelines.OhioenergyPipeline": 300,
-# }
+ITEM_PIPELINES = {
+    # "ohioenergy.pipelines.OhioenergyPipeline": 300,
+    # "ohioenergy.pipelines.OhioenergySerializePipeline": 100,
+    "ohioenergy.pipelines.OhioenergySavePipeline": 200,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

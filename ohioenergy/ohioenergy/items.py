@@ -8,5 +8,19 @@ import scrapy
 
 class OhioenergyItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    # table_id = scrapy.Field()
+    utility_type = scrapy.Field()
+    scrape_timestamp = scrapy.Field()
+    name = scrapy.Field()
+    address = scrapy.Field()
+    phone = scrapy.Field()
+    url = scrapy.Field()
+    price = scrapy.Field()
+    rate_type = scrapy.Field()
+    percent_renewable = scrapy.Field()
+    intro_price = scrapy.Field()
+    term_length = scrapy.Field()
+    early_term_fee = scrapy.Field()
+    monthly_fee = scrapy.Field()
+    promo_offer = scrapy.Field()
+    # pass
