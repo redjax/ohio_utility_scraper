@@ -57,6 +57,6 @@ tomli==2.0.1
 Twisted==22.10.0
 typing-extensions==4.5.0
 url-normalize==1.4.3
-urllib3==1.26.15
+urllib3==1.26.18
 w3lib==2.1.1
 zope-interface==6.0
