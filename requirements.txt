@@ -46,7 +46,7 @@ requests==2.29.0
 requests-cache==1.0.1
 requests-file==1.5.1
 ruff==0.0.263
-scrapy==2.8.0
+scrapy==2.11.1
 service-identity==21.1.0
 setuptools==67.7.2
 six==1.16.0
